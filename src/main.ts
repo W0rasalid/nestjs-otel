@@ -1,4 +1,4 @@
-import otelSDK from './observability';
+import otelSDK from './observability/opentelemetry/telemetry';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger } from 'nestjs-pino';

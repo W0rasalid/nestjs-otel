@@ -1,9 +1,9 @@
 // src/opentelemetry.config.ts หรือไฟล์ที่เกี่ยวข้อง
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http'; // หรือ '@opentelemetry/exporter-trace-otlp-grpc'
-import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
+// import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import {
   CompositePropagator,
@@ -14,8 +14,20 @@ import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http'; // หรือ gRPC ถ้าใช้ gRPC
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
-import { Resource, resourceFromAttributes } from '@opentelemetry/resources'; // Correct import path
+import { resourceFromAttributes } from '@opentelemetry/resources'; // Correct import path
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+
+// ***  instrumentations ที่ต้องการปรับแต่ง ***
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
+import {
+  NestInstrumentation,
+  AttributeNames,
+} from '@opentelemetry/instrumentation-nestjs-core';
+
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
 
 // กำหนด URL ของ OpenTelemetry Collector (Trace Receiver)
 const traceCollectorEndpoint =
@@ -48,6 +60,12 @@ const resource = resourceFromAttributes({
   'service.host.os.kernel.architecture': process.arch || 'unknown-kernel-arch',
 });
 
+// const provider = new NodeTracerProvider();
+// provider.register();
+// registerInstrumentations({
+//   instrumentations: [new NestInstrumentation()],
+// });
+
 const otelSDK = new NodeSDK({
   resource: resource,
   // สำหรับ Metrics: ถ้าต้องการให้ Collector จัดการ Metrics ด้วย
@@ -76,7 +94,34 @@ const otelSDK = new NodeSDK({
       }),
     ],
   }),
-  instrumentations: [getNodeAutoInstrumentations()],
+  // instrumentations: [
+  //   getNodeAutoInstrumentations({
+  //     '@opentelemetry/instrumentation-nestjs-core': {
+  //       // ปรับแต่ง NestJS instrumentation ถ้าต้องการ
+  //       enabled: true,
+  //     },
+  //   }),
+  // ], // auto-instrumentations
+
+  instrumentations: [
+    new HttpInstrumentation({
+      // Options สำหรับ HTTP/HTTPS requests
+      // ... (options อื่นๆ ตามที่คุณต้องการ)
+      enabled: true,
+    }),
+    new ExpressInstrumentation({
+      // Options สำหรับ ExpressInstrumentation
+      // ... (options อื่นๆ ของ ExpressInstrumentation)
+      enabled: true,
+      ignoreLayers: ['NestMiddleware', 'NestInterceptor', 'NestGuard'],
+    }),
+    new NestInstrumentation({
+      // Options สำหรับ NestJS
+      // ... (options อื่นๆ ตามที่คุณต้องการ)
+      enabled: true,
+    }),
+    // หากมี instrumentations อื่นๆ ที่คุณต้องการใช้ ก็เพิ่มที่นี่
+  ],
 });
 
 export default otelSDK;

@@ -3,6 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LoggerModule } from 'nestjs-pino';
 import { OpenTelemetryModule } from 'nestjs-otel';
+import { ObservabilityModule } from './observability/observability.module';
+import { ConfigurationModule } from './configuration/configuration.module';
 
 const OpenTelemetryModuleConfig = OpenTelemetryModule.forRoot({
   metrics: {
@@ -31,7 +33,9 @@ const OpenTelemetryModuleConfig = OpenTelemetryModule.forRoot({
             : undefined,
       },
     }),
-    OpenTelemetryModuleConfig,
+    // OpenTelemetryModuleConfig,
+    ObservabilityModule,
+    ConfigurationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
