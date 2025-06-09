@@ -8,7 +8,7 @@ async function bootstrap() {
   await otelSDK.start();
 
   const app = await NestFactory.create(AppModule);
-  app.useLogger(app.get(Logger));
+  // app.useLogger(app.get(Logger));
   await app.listen(4000);
 }
 bootstrap();

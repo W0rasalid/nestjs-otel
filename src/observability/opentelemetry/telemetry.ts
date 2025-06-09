@@ -28,6 +28,8 @@ import {
 
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
+import { WinstonInstrumentation } from '@opentelemetry/instrumentation-winston';
+import { PinoInstrumentation } from '@opentelemetry/instrumentation-pino';
 
 // กำหนด URL ของ OpenTelemetry Collector (Trace Receiver)
 const traceCollectorEndpoint =
@@ -121,6 +123,8 @@ const otelSDK = new NodeSDK({
       enabled: true,
     }),
     // หากมี instrumentations อื่นๆ ที่คุณต้องการใช้ ก็เพิ่มที่นี่
+    new WinstonInstrumentation(),
+    new PinoInstrumentation(),
   ],
 });
 

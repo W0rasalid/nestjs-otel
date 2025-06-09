@@ -24,15 +24,15 @@ const OpenTelemetryModuleConfig = OpenTelemetryModule.forRoot({
 
 @Module({
   imports: [
-    LoggerModule.forRoot({
-      pinoHttp: {
-        level: process.env.LOG_LEVEL || 'info',
-        transport:
-          process.env.NODE_ENV !== 'production'
-            ? { target: 'pino-pretty' }
-            : undefined,
-      },
-    }),
+    // LoggerModule.forRoot({
+    //   pinoHttp: {
+    //     level: process.env.LOG_LEVEL || 'info',
+    //     transport:
+    //       process.env.NODE_ENV !== 'production'
+    //         ? { target: 'pino-pretty' }
+    //         : undefined,
+    //   },
+    // }),
     // OpenTelemetryModuleConfig,
     ObservabilityModule,
     ConfigurationModule,

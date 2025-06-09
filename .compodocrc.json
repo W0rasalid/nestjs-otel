@@ -1,0 +1,7 @@
+{
+  "port": 8000,
+  "output": "documentation",
+  "tsconfig": "./tsconfig.json",
+  "serve": true,
+  "name": "My Project Documentation"
+}
